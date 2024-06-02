@@ -48,3 +48,8 @@ class CustomUserChangeForm(UserChangeForm):
 
     def clean_password(self):
         return self.initial["password1"]
+
+class LoginUserForm(forms.Form):
+    username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
+    password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
+

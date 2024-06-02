@@ -6,6 +6,7 @@ from django.views.defaults import page_not_found
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Crypto.urls')),
+
 ]
 
 
