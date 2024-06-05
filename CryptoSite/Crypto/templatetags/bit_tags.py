@@ -1,6 +1,7 @@
 from django import template
 
 from Crypto import views
+from Crypto.utils import menu
 
 register = template.Library()
 
@@ -13,3 +14,7 @@ def get_categories():
 def show_categories(cat_selected=0):
     cats = views.cats_db
     return {"cats": cats, "cat_selected": cat_selected}
+
+@register.simple_tag
+def get_menu():
+    return menu

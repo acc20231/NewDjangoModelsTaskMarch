@@ -64,6 +64,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'Crypto.context_processors.get_bit_context',
             ],
         },
     },
@@ -78,7 +79,7 @@ WSGI_APPLICATION = 'CryptoSite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'NewCrypto',
+        'NAME': 'New',
         'USER': 'postgres',
         'PASSWORD': 'root',
         'HOST': '127.0.0.1',
@@ -130,3 +131,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'Crypto.CustomUser'
 
+LOGOUT_REDIRECT_URL = 'home'
+
+LOGIN_URL = 'login'
