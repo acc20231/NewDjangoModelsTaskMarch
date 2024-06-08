@@ -1,11 +1,14 @@
-from django.contrib.auth import authenticate, logout
+from django.contrib.auth import authenticate, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from Crypto.forms import LoginUserForm
+from django.views.generic import CreateView, UpdateView
+
+from Crypto.forms import LoginUserForm, RegisterUserForm, ProfileUserForm, UserPasswordChangeForm
 from Crypto.models import Crypto
 
 menu = [{'title': "О сайте", 'url_name': 'about'},
@@ -50,31 +53,18 @@ def show_post(request, post_slug):
 
     return render(request, 'bit/post.html', context=data)
 
+
 @login_required
 def about(request):
     return render(request, 'bit/about.html', {'title': 'О сайте', 'menu': menu})
-
-@login_required
-def categories(request, cat_id):
-    return HttpResponse(f"<h1>Статьи по категориям</h1><p >id:{cat_id}</p>")
-
-@login_required
-def categories_by_slug(request, cat_slug):
-    if request.GET:
-        print(request.GET)
-    return HttpResponse(f"<h1>Статьи по категориям</h1><p >slug:{cat_slug}</p>")
 
 
 def page_not_found(request, exception):
     return HttpResponseNotFound('<h1>Страница не найдена</h1>')
 
-@login_required
+
 def addpage(request):
     return HttpResponse("Добавить новую криптовалюту")
-
-
-def login(request):
-    return HttpResponse("Авторизация")
 
 
 def show_category(request, cat_id):
@@ -88,29 +78,42 @@ def show_category(request, cat_id):
     return render(request, 'bit/index.html', context=data)
 
 
-# def login_user(request):
-#     if request.method == 'POST':
-#         form = LoginUserForm(request.POST)
-#         if form.is_valid():
-#             cd = form.cleaned_data
-#             user = authenticate(request, username=cd['username'], password=cd['password'])
-#             if user and user.is_active:
-#                 login(user)
-#                 return HttpResponseRedirect(reverse('home'))
-#
-#     else:
-#         form = LoginUserForm()
-#     return render(request, 'users/login.html', {'form': form})
-
 class LoginUser(LoginView):
     form_class = AuthenticationForm
     template_name = 'users/login.html'
     extra_context = {'title': "Авторизация"}
 
-    # def get_success_url(self):
-    #     return reverse_lazy('home')
+    def get_success_url(self):
+        return reverse_lazy('home')
 
 
 def logout_user(request):
     logout(request)
     return HttpResponseRedirect(reverse('login'))
+
+
+class RegisterUser(CreateView):
+    form_class = RegisterUserForm
+    template_name = 'users/register.html'
+    extra_context = {'title': "Регистрация"}
+    success_url = reverse_lazy('login')
+
+
+class ProfileUser(LoginRequiredMixin, UpdateView):
+    model = get_user_model()
+    form_class = ProfileUserForm
+    template_name = 'users/profile.html'
+    extra_context = {'title': "Профиль пользователя"}
+
+    def get_success_url(self):
+        return reverse_lazy('users:profile', args=[self.request.user.pk])
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+
+class UserPasswordChange(PasswordChangeView):
+    form_class = UserPasswordChangeForm
+    success_url = reverse_lazy("password_change_done")
+    template_name = "users/password_change_form.html"
+    extra_context = {'title': "Изменение пароля"}
