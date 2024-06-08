@@ -39,6 +39,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.username
 
 class Crypto(models.Model):
+
     class Status(models.IntegerChoices):
         DRAFT = 0, 'Черновик'
         PUBLISHED = 1, 'Опубликовано'
