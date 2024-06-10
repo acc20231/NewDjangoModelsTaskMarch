@@ -1,10 +1,11 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.views import PasswordChangeView
+from django.core.exceptions import ValidationError
 from django.db.models import fields
 from django import forms
 from django.urls import reverse_lazy
 
-from .models import CustomUser
+from .models import CustomUser, Category, Crypto
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -68,3 +69,20 @@ class ProfileUserForm(forms.ModelForm):
             'first_name': forms.TextInput(attrs={'class': 'form-input'}),
             'last_name': forms.TextInput(attrs={'class': 'form-input'}),
         }
+
+class AddPostForm(forms.ModelForm):
+    category = forms.ModelChoiceField(queryset=Category.objects.all(), empty_label="Категория не выбрана", label='Категория')
+    user = forms.ModelChoiceField(queryset=CustomUser.objects.all(), empty_label="Пользователь не выбран", label='Пользователь')
+    class Meta:
+        model = Crypto
+        fields = ['title', 'slug', 'content', 'is_published', 'category', 'user']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-input'}),
+            'content': forms.Textarea(attrs={'cols': 60, 'rows': 10}),
+        }
+
+    def clean_title(self):
+        title = self.cleaned_data['title']
+        if len(title) > 50:
+            raise ValidationError("Длина превышает 50 символов")
+        return title

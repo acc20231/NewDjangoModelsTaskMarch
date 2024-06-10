@@ -13,4 +13,4 @@ urlpatterns = [
 handler404 = page_not_found
 
 admin.site.site_header = 'Панель администратора'
-admin.site.index_title = 'Классификая Криптвалюты'
+admin.site.index_title = 'Классификация Криптовалюты'

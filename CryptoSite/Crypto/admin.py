@@ -19,5 +19,8 @@ class CryptoAdmin(admin.ModelAdmin):
     # list_display_links = ('username',)
     list_editable = ('is_published',)
 
+@admin.register(Category)
+class CryptoAdmin(admin.ModelAdmin):
+    fields = ['name', 'slug']
+    list_display = ('name', 'slug')
 
-admin.site.register(Category)

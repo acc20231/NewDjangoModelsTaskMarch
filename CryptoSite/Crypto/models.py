@@ -8,13 +8,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         DRAFT = 0, 'Мужчина'
         PUBLISHED = 1, 'Женщина'
 
-    username = models.CharField(verbose_name="username", max_length=150, unique=True, )
-    email = models.EmailField(verbose_name="email address", blank=True, max_length=200)
-    first_name = models.CharField(verbose_name="first_name", max_length=150, blank=True, default='')
-    last_name = models.CharField(verbose_name="last_name", max_length=150, blank=True, default='')
-    is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    is_superuser = models.BooleanField(default=False)
+    username = models.CharField(verbose_name="Логин", max_length=150, unique=True, )
+    email = models.EmailField(verbose_name="E-mail адрес", blank=True, max_length=200)
+    first_name = models.CharField(verbose_name="Имя", max_length=150, blank=True, default='')
+    last_name = models.CharField(verbose_name="Фамилия", max_length=150, blank=True, default='' )
+    is_staff = models.BooleanField(default=False, verbose_name='Доступ к сайду администратора')
+    is_active = models.BooleanField(default=True, verbose_name='Активность')
+    is_superuser = models.BooleanField(default=False, verbose_name='Администратор')
     type = models.BooleanField(choices=tuple(map(lambda x: (bool(x[0]), x[1]), Status.choices)),
                                default=Status.DRAFT, verbose_name='Пол')
 
@@ -44,11 +44,11 @@ class Crypto(models.Model):
         DRAFT = 0, 'Черновик'
         PUBLISHED = 1, 'Опубликовано'
 
-    title = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255, db_index=True, unique=True)
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, null=True)
-    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, null=True)
-    content = models.TextField(blank=True)
+    title = models.CharField(max_length=255, verbose_name='Название криптовалюты')
+    slug = models.SlugField(max_length=255, db_index=True, verbose_name='URL')
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, null=True, verbose_name='Категория криптовалюты')
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, null=True, verbose_name='Пользователь')
+    content = models.TextField(blank=True, verbose_name='Информация о криптовалюте')
     time_create = models.DateTimeField(auto_now_add=True)
     time_update = models.DateTimeField(auto_now=True)
     is_published = models.BooleanField(choices=tuple(map(lambda x: (bool(x[0]), x[1]), Status.choices)),
@@ -71,7 +71,7 @@ class Crypto(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=100, db_index=True, verbose_name='Категории')
-    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='Slug')
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='URL')
 
     class Meta:
         verbose_name = 'Категория'

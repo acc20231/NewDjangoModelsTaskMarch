@@ -4,11 +4,11 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, UpdateView
 
-from Crypto.forms import LoginUserForm, RegisterUserForm, ProfileUserForm, UserPasswordChangeForm
+from Crypto.forms import LoginUserForm, RegisterUserForm, ProfileUserForm, UserPasswordChangeForm, AddPostForm
 from Crypto.models import Crypto
 
 menu = [{'title': "О сайте", 'url_name': 'about'},
@@ -64,7 +64,14 @@ def page_not_found(request, exception):
 
 
 def addpage(request):
-    return HttpResponse("Добавить новую криптовалюту")
+    if request.method == 'POST':
+        form = AddPostForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = AddPostForm()
+    return render(request, 'bit/addpage.html', {'menu': menu, 'title': 'Добавление статьи', 'form': form})
 
 
 def show_category(request, cat_id):
