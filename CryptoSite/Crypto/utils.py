@@ -2,7 +2,6 @@ menu = [{'title': "О сайте", 'url_name': 'about'},
         {'title': "Добавить новую криптовалюту", 'url_name': 'add_page'},
         ]
 
-
 class DataMixin:
     paginate_by = 5
     title_page = None

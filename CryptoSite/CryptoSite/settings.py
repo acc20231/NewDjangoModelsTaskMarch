@@ -134,6 +134,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'Crypto.CustomUser'
+AUTH_GROUP_MODEL = 'Crypto.CustomGroup'
+
 
 LOGOUT_REDIRECT_URL = 'home'
 

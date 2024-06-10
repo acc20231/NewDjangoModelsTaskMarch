@@ -9,7 +9,7 @@ urlpatterns = [
     path('', views.index, name='home'),
     path('about/', views.about, name='about'),
 
-    path('addpage/', views.addpage, name='add_page'),
+    path('addpage/', views.AddPage.as_view(), name='add_page'),
     path('category/<int:cat_id>/', views.show_category, name='category'),
     path('post/<slug:post_slug>/', views.show_post, name='post'),
 
@@ -24,9 +24,7 @@ urlpatterns = [
          PasswordResetView.as_view(
             template_name="users/password_reset_form.html",
             email_template_name="users/password_reset_email.html",
-            success_url=reverse_lazy("password_reset_done")
-         ),
-         name='password_reset'),
+            success_url=reverse_lazy("password_reset_done")),name='password_reset'),
 
     path('password-reset/done/',
          PasswordResetDoneView.as_view(template_name="users/password_reset_done.html"),
@@ -35,9 +33,7 @@ urlpatterns = [
     path('password-reset/<uidb64>/<token>/',
          PasswordResetConfirmView.as_view(
             template_name="users/password_reset_confirm.html",
-            success_url=reverse_lazy("password_reset_complete")
-         ),
-         name='password_reset_confirm'),
+            success_url=reverse_lazy("password_reset_complete")),name='password_reset_confirm'),
 
     path('password-reset/complete/',
          PasswordResetCompleteView.as_view(template_name="users/password_reset_complete.html"),

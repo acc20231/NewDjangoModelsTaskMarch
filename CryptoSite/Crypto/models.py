@@ -1,7 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Permission
 from django.urls import reverse
-from .manager import CustomUserManager
+from .manager import CustomUserManager, CustomGroupManager
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     class Status(models.IntegerChoices):
@@ -11,7 +11,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(verbose_name="Логин", max_length=150, unique=True, )
     email = models.EmailField(verbose_name="E-mail адрес", blank=True, max_length=200)
     first_name = models.CharField(verbose_name="Имя", max_length=150, blank=True, default='')
-    last_name = models.CharField(verbose_name="Фамилия", max_length=150, blank=True, default='' )
+    last_name = models.CharField(verbose_name="Фамилия", max_length=150, blank=True, default='')
+
+    groups = models.ManyToManyField('Crypto.CustomGroup', blank=True, verbose_name="Группы",)
+
     is_staff = models.BooleanField(default=False, verbose_name='Доступ к сайду администратора')
     is_active = models.BooleanField(default=True, verbose_name='Активность')
     is_superuser = models.BooleanField(default=False, verbose_name='Администратор')
@@ -38,6 +41,25 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
+class CustomGroup(models.Model):
+    name = models.CharField(("Название группы"), max_length=150, unique=True)
+    permissions = models.ManyToManyField(
+        Permission,
+        verbose_name=("Разрешения для пользователей"),
+        blank=True,
+    )
+
+    objects = CustomGroupManager()
+
+    class Meta:
+        verbose_name = ("Группа")
+        verbose_name_plural = ("Группы")
+
+    def __str__(self):
+        return self.name
+
+    def natural_key(self):
+        return (self.name,)
 class Crypto(models.Model):
 
     class Status(models.IntegerChoices):
@@ -68,7 +90,6 @@ class Crypto(models.Model):
     def __str__(self):
         return self.title
 
-
 class Category(models.Model):
     name = models.CharField(max_length=100, db_index=True, verbose_name='Категории')
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='URL')
@@ -79,3 +100,4 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+

@@ -1,15 +1,15 @@
-from django.contrib.auth import authenticate, logout, get_user_model
+from django.contrib.auth import logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.views import LoginView, PasswordChangeView
-from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
+from django.http import  HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, UpdateView
-
-from Crypto.forms import LoginUserForm, RegisterUserForm, ProfileUserForm, UserPasswordChangeForm, AddPostForm
+from Crypto.forms import  RegisterUserForm, ProfileUserForm, UserPasswordChangeForm, AddPostForm
 from Crypto.models import Crypto
+from Crypto.utils import DataMixin
 
 menu = [{'title': "О сайте", 'url_name': 'about'},
         {'title': "Добавить новую криптовалюту", 'url_name': 'add_page'},
@@ -62,17 +62,16 @@ def about(request):
 def page_not_found(request, exception):
     return HttpResponseNotFound('<h1>Страница не найдена</h1>')
 
+class AddPage(PermissionRequiredMixin, LoginRequiredMixin, DataMixin, CreateView):
+    form_class = AddPostForm
+    template_name = 'bit/addpage.html'
+    title_page = 'Добавление статьи'
+    permission_required = 'crypto.add_crypto'
 
-def addpage(request):
-    if request.method == 'POST':
-        form = AddPostForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-    else:
-        form = AddPostForm()
-    return render(request, 'bit/addpage.html', {'menu': menu, 'title': 'Добавление статьи', 'form': form})
-
+    def form_valid(self, form):
+        w = form.save(commit=False)
+        w.author = self.request.user
+        return super().form_valid(form)
 
 def show_category(request, cat_id):
     data = {
@@ -84,7 +83,6 @@ def show_category(request, cat_id):
 
     return render(request, 'bit/index.html', context=data)
 
-
 class LoginUser(LoginView):
     form_class = AuthenticationForm
     template_name = 'users/login.html'
@@ -93,18 +91,15 @@ class LoginUser(LoginView):
     def get_success_url(self):
         return reverse_lazy('home')
 
-
 def logout_user(request):
     logout(request)
     return HttpResponseRedirect(reverse('login'))
-
 
 class RegisterUser(CreateView):
     form_class = RegisterUserForm
     template_name = 'users/register.html'
     extra_context = {'title': "Регистрация"}
     success_url = reverse_lazy('login')
-
 
 class ProfileUser(LoginRequiredMixin, UpdateView):
     model = get_user_model()

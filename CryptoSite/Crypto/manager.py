@@ -1,7 +1,5 @@
-from django.contrib import auth
+from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.hashers import make_password
-
 
 class CustomUserManager(BaseUserManager):
 
@@ -31,3 +29,8 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
         return self.create_user(username, email, password, **extra_fields)
+
+class CustomGroupManager(models.Manager):
+    use_in_migrations = True
+    def get_by_natural_key(self, name):
+        return self.get(name=name)
