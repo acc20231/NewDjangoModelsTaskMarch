@@ -66,6 +66,7 @@ class AddPostForm(forms.ModelForm):
     category = forms.ModelChoiceField(queryset=Category.objects.all(), empty_label="Категория не выбрана", label='Категория')
     user = forms.ModelChoiceField(queryset=CustomUser.objects.all(), empty_label="Пользователь не выбран", label='Пользователь')
     class Meta:
+
         model = Crypto
         fields = ['title', 'slug', 'content', 'is_published', 'category', 'user']
         widgets = {
